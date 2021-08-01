@@ -44,6 +44,10 @@
 
 #include "bondcpp/BondSM_sm.hpp"
 
+#undef min
+#undef max
+#undef ERROR
+
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp_lifecycle/lifecycle_node.hpp"
 

@@ -30,17 +30,22 @@ if(BUILD_TESTING)
   find_package(rosidl_cmake REQUIRED)
   find_package(Threads REQUIRED)
 
-  find_package(PkgConfig REQUIRED)
-  pkg_search_module(UUID REQUIRED uuid)
-  # we have to find the absolute path to uuid as target_link_directories is not available before cmake 3.13
-  find_library(uuid_ABS_PATH ${UUID_LIBRARIES} PATHS ${UUID_LIBRARY_DIRS})
+  if(WIN32)
+    set(uuid_LIB Rpcrt4)
+  else()
+    find_package(PkgConfig REQUIRED)
+    pkg_search_module(UUID REQUIRED uuid)
+    # we have to find the absolute path to uuid as target_link_directories is not available before cmake 3.13
+    find_library(uuid_ABS_PATH ${UUID_LIBRARIES} PATHS ${UUID_LIBRARY_DIRS})
+    set(uuid_LIB ${uuid_ABS_PATH})
+  endif()
 
   ament_lint_auto_find_test_dependencies()
 
   ament_add_gtest(test_callbacks_cpp test/test_callbacks_cpp.cpp)
   if(TARGET test_callbacks_cpp)
     target_include_directories(test_callbacks_cpp PRIVATE include)
-    target_link_libraries(test_callbacks_cpp ${uuid_ABS_PATH})
+    target_link_libraries(test_callbacks_cpp ${uuid_LIB})
     ament_target_dependencies(test_callbacks_cpp bond bondcpp rclcpp rclcpp_lifecycle)
     rosidl_target_interfaces(test_callbacks_cpp
       ${PROJECT_NAME} "rosidl_typesupport_cpp")
